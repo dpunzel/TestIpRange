@@ -79,6 +79,7 @@ public class TestIpRange {
 
       sIP = String.valueOf(startAddress);
       eIP = String.valueOf(endAddress);
+
       addIpRangesWithMaskRoute(sIP, eIP, String.valueOf(prefixLength), routeTempVariable, cidr);
 
       for (int i = 0; i < storage.size(); i++) {
@@ -160,11 +161,57 @@ public class TestIpRange {
       return String.valueOf(ipDecimal);
    }
 
+   public long convertIpToDecimalLongh(String ip) {
+      String ipAddress = "192.168.1.10";
+      String[] addrArray = ipAddress.split("\\.");
+
+      long ipDecimal = 0;
+
+      for (int i = 0; i < addrArray.length; i++) {
+
+         int power = 3 - i;
+         ipDecimal += ((Integer.parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
+      }
+
+      System.out.println(ipDecimal);
+      return ipDecimal;
+   }
+
+   public boolean compareToLookUp(long startIP, long endIP, long lookUpIP) {
+      return (startIP<=lookUpIP && lookUpIP<=endIP);
+   }
+
+   /**
+    * Need to test lookup after creating add function....
+    * @param lookUpIP
+    * @return
+    */
+   public int lookUp(long lookUpIP) {
+      String route = "-99";
+      boolean done = false;
+      int i = 0;
+
+      while (i < storage.size() && !done) {
+         if (compareToLookUp(convertIpToDecimalLongh(storage.get(i)[0]), convertIpToDecimalLongh(storage.get(i)[1]), lookUpIP)) {
+            done = true;
+            route =(storage.get(i)[3]);
+         }
+         i++;
+      }
+      return Integer.parseInt(route);
+   }
+
    public static void main(String[] args) throws UnknownHostException {
+      long startIP = 0;
+      long endIP = 100;
+      long lookUpIp = 500;
+      long ipLookupValue = 300;
       TestIpRange test = new TestIpRange("192.168.0.0/17");
 
       System.out.println(test.isInRange("192.168.2.1"));
       test.convertIpToDecimal("192.168.2.0");
+      System.out.println(test.compareToLookUp(startIP, endIP, lookUpIp));
+      System.out.println(test.lookUp(ipLookupValue));
       //test.comparedIp("192.168.2.0");
    }
 }
